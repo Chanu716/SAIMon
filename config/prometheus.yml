@@ -1,0 +1,61 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'saimon'
+    environment: 'development'
+
+# Alertmanager configuration (optional for Phase 5)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ['alertmanager:9093']
+
+# Rule files for recording and alerting rules
+rule_files:
+  # - "alerts/*.yml"
+  # - "recording_rules/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+          tier: 'monitoring'
+
+  # Node Exporter - System metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          service: 'node-exporter'
+          tier: 'infrastructure'
+
+  # SAIMon API metrics
+  - job_name: 'saimon-api'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['saimon-api:8000']
+        labels:
+          service: 'saimon-api'
+          tier: 'application'
+
+  # Add more scrape configs here for your services
+  # Example for a custom application:
+  # - job_name: 'my-app'
+  #   static_configs:
+  #     - targets: ['my-app:8080']
+  #       labels:
+  #         service: 'my-app'
+  #         environment: 'production'
+
+# Remote write configuration (optional for scaling)
+# remote_write:
+#   - url: "http://timescaledb:9201/write"
+
+# Remote read configuration (optional)
+# remote_read:
+#   - url: "http://timescaledb:9201/read"

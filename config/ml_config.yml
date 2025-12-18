@@ -1,0 +1,184 @@
+# SAIMon ML Configuration
+
+# Data Collection Settings
+data_collection:
+  # How far back to look for training data (in hours)
+  lookback_hours: 168  # 7 days
+  
+  # Scrape interval (in seconds)
+  scrape_interval: 60
+  
+  # Minimum data points required for training
+  min_data_points: 1000
+  
+  # Metrics to monitor (add your custom metrics here)
+  metrics:
+    - name: "node_cpu_seconds_total"
+      type: "counter"
+      description: "CPU usage in seconds"
+    - name: "node_memory_MemAvailable_bytes"
+      type: "gauge"
+      description: "Available memory in bytes"
+    - name: "node_disk_read_bytes_total"
+      type: "counter"
+      description: "Disk read bytes"
+    - name: "node_disk_written_bytes_total"
+      type: "counter"
+      description: "Disk written bytes"
+    - name: "node_network_receive_bytes_total"
+      type: "counter"
+      description: "Network receive bytes"
+    - name: "node_network_transmit_bytes_total"
+      type: "counter"
+      description: "Network transmit bytes"
+
+# Model Configuration
+models:
+  # Statistical Models
+  statistical:
+    zscore:
+      enabled: true
+      threshold: 3.0
+      window_size: 100
+    
+    arima:
+      enabled: false
+      order: [1, 1, 1]  # (p, d, q)
+      seasonal_order: [1, 1, 1, 24]  # (P, D, Q, s)
+  
+  # Unsupervised ML Models
+  unsupervised:
+    isolation_forest:
+      enabled: true
+      contamination: 0.1  # Expected proportion of anomalies
+      n_estimators: 100
+      max_samples: 256
+      random_state: 42
+    
+    one_class_svm:
+      enabled: false
+      kernel: 'rbf'
+      gamma: 'auto'
+      nu: 0.1
+  
+  # Deep Learning Models
+  deep_learning:
+    lstm_autoencoder:
+      enabled: false
+      sequence_length: 50
+      encoding_dim: 32
+      epochs: 50
+      batch_size: 32
+      learning_rate: 0.001
+      reconstruction_threshold: 0.5
+  
+  # Online Learning Models
+  streaming:
+    river_halfspace_trees:
+      enabled: false
+      n_trees: 10
+      height: 8
+      window_size: 250
+
+# Training Configuration
+training:
+  # How often to retrain models (in hours)
+  retrain_interval: 24
+  
+  # Training schedule (cron expression)
+  schedule: "0 2 * * *"  # 2 AM daily
+  
+  # Train-test split ratio
+  test_size: 0.2
+  
+  # Enable cross-validation
+  cross_validation: true
+  cv_folds: 5
+  
+  # Model versioning
+  save_models: true
+  model_dir: "/app/models"
+  max_model_versions: 5
+
+# Anomaly Detection Configuration
+anomaly_detection:
+  # Anomaly threshold (confidence score)
+  threshold: 0.7
+  
+  # Minimum consecutive anomalies before alerting
+  min_consecutive: 3
+  
+  # Sliding window for real-time detection
+  window_size: 60
+  
+  # Severity levels
+  severity_levels:
+    low: 0.7
+    medium: 0.85
+    high: 0.95
+    critical: 0.99
+
+# Feature Engineering
+feature_engineering:
+  # Enable feature scaling
+  scaling: true
+  scaler_type: "standard"  # standard, minmax, robust
+  
+  # Time-based features
+  time_features:
+    - hour_of_day
+    - day_of_week
+    - is_weekend
+  
+  # Statistical features
+  statistical_features:
+    - rolling_mean
+    - rolling_std
+    - rolling_min
+    - rolling_max
+  
+  # Window sizes for rolling features
+  rolling_windows: [5, 10, 30, 60]
+
+# Alert Configuration
+alerting:
+  # Enable alerting
+  enabled: true
+  
+  # Cooldown period between alerts (in minutes)
+  cooldown: 15
+  
+  # Alert channels
+  channels:
+    - slack
+    - email
+  
+  # Alert aggregation
+  aggregate_window: 300  # 5 minutes
+  
+  # Noise reduction
+  noise_reduction:
+    enabled: true
+    min_confidence: 0.8
+    correlation_threshold: 0.9
+
+# Performance Settings
+performance:
+  # Number of worker processes
+  workers: 4
+  
+  # Batch size for inference
+  inference_batch_size: 100
+  
+  # Enable GPU acceleration (if available)
+  use_gpu: false
+  
+  # Model cache size
+  cache_size: 1000
+
+# Logging
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "json"  # json, text
+  log_predictions: true
+  log_anomalies: true

@@ -1,0 +1,5 @@
+# Placeholder for trained models
+# This directory will contain:
+# - *.pkl files (scikit-learn models)
+# - *.pt/*.pth files (PyTorch models)
+# - *.h5 files (TensorFlow/Keras models)
